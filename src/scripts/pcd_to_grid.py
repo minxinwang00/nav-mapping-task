@@ -3,10 +3,12 @@ import numpy as np
 import cv2
 import yaml
 
-# 参数设置
-pcd_path = '/home/mxw/ros2_ws/final_map.pcd'
-output_pgm = '/home/mxw/ros2_ws/my_map.pgm'
-output_yaml = '/home/mxw/ros2_ws/my_map.yaml'
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+pcd_path = os.path.join(BASE_DIR, '../../maps/pcd_map.pcd')
+output_pgm = os.path.join(BASE_DIR, '../../maps/occugrid_map.pgm')
+output_yaml = os.path.join(BASE_DIR, '../../maps/occugrid_map.yaml')
 resolution = 0.05          # 栅格分辨率，单位：米/像素
 height_min = 0.2           # 地面以上最低高度（米）
 height_max = 2.0           # 最高高度（米）
