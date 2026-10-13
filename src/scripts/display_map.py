@@ -15,20 +15,30 @@ class MapPublisher(Node):
         self.grid_pub = self.create_publisher(OccupancyGrid, '/map', 10)
 
         # 读取点云并降采样
-        pcd = o3d.io.read_point_cloud('/home/mxw/ros2_ws/final_map.pcd')
-        print(f"原始点数：{len(pcd.points)}")
-        pcd = pcd.voxel_down_sample(voxel_size=0.2)   # 0.2 米降采样
-        print(f"降采样后点数：{len(pcd.points)}")
-        self.points = np.asarray(pcd.points).astype(np.float32)
+        import os
 
-        # 读取栅格地图
-        with open('/home/mxw/ros2_ws/my_map.yaml', 'r') as f:
-            meta = yaml.safe_load(f)
-        self.resolution = meta['resolution']
-        self.origin = meta['origin']
-        self.grid_img = cv2.imread(meta['image'], cv2.IMREAD_GRAYSCALE)
-        self.grid_height, self.grid_width = self.grid_img.shape
+# 在类的 __init__ 里，先加一行计算仓库根目录
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+pcd_path = os.path.join(BASE_DIR, '../../maps/pcd_map.pcd')
+yaml_path = os.path.join(BASE_DIR, '../../maps/occugrid_map.yaml')
 
+pcd = o3d.io.read_point_cloud(pcd_path)
+print(f"原始点数：{len(pcd.points)}")
+pcd = pcd.voxel_down_sample(voxel_size=0.2)   # 0.2 米降采样
+print(f"降采样后点数：{len(pcd.points)}")
+self.points = np.asarray(pcd.points).astype(np.float32)
+
+# 读取栅格地图
+with open(yaml_path, 'r') as f:
+    meta = yaml.safe_load(f)
+self.resolution = meta['resolution']
+self.origin = meta['origin']
+
+# yaml 中的 image 是相对文件名（occugrid_map.pgm），需拼接 maps 目录
+maps_dir = os.path.dirname(yaml_path)
+image_path = os.path.join(maps_dir, meta['image'])
+self.grid_img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+self.grid_height, self.grid_width = self.grid_img.shape
         # 预先构建 PointCloud2 消息
         header = Header()
         header.frame_id = 'camera_init'
