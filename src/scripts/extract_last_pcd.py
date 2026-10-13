@@ -6,8 +6,12 @@ import sensor_msgs_py.point_cloud2 as pc2
 import open3d as o3d
 import numpy as np
 
-bag_path = '/home/mxw/my_pointcloud_bag2'
-output_pcd = '/home/mxw/ros2_ws/final_map.pcd'
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# 假设 bag 文件夹放在仓库根目录下（需自行准备或修改此路径）
+bag_path = os.path.join(BASE_DIR, '../../my_pointcloud_bag2')
+output_pcd = os.path.join(BASE_DIR, '../../maps/pcd_map.pcd')
 
 storage_options = rosbag2_py.StorageOptions(uri=bag_path, storage_id='sqlite3')
 converter_options = rosbag2_py.ConverterOptions(
